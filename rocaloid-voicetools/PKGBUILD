@@ -1,0 +1,54 @@
+
+pkgname=rocaloid-voicetools
+pkgver=0.0.5f02f15
+pkgrel=1
+epoch=
+pkgdesc="Toolchain for building Rocaloid voice databases"
+arch=('x86_64')
+url="https://github.com/Rocaloid/Tools"
+license=('GPL3')
+groups=()
+depends=()
+makedepends=('cmake' 'rocaloid-rutil2' 'rocaloid-cvesvp' 'rocaloid-cvedsp2' 'rocaloid-rfnl')
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("git+${url}.git" "fixes.patch")
+md5sums=('SKIP' 'SKIP')
+validpgpkeys=()
+
+pkgver() {
+  cd "${srcdir}/Tools"
+  echo "0.0."`git describe --always`
+}
+
+build() {
+    cd "$srcdir/Tools"
+    patch --strip=1 --input="$srcdir"/fixes.patch
+    cd src
+    mkdir -p build
+    cd build
+    cmake ../ -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=/usr
+    make -j6
+}
+
+package() {
+	cd "$srcdir/Tools/src/build"
+	install -D con2oct     "${pkgdir}/usr/bin/con2oct"
+	install -D editrudb    "${pkgdir}/usr/bin/editrudb"
+	install -D genrudb     "${pkgdir}/usr/bin/genrudb"
+	install -D pcompdiff   "${pkgdir}/usr/bin/pcompdiff"
+	install -D proberudb   "${pkgdir}/usr/bin/proberudb"
+	install -D rsegment    "${pkgdir}/usr/bin/rsegment"
+	install -D rudb2oct    "${pkgdir}/usr/bin/rudb2oct"
+	install -D utau2rec    "${pkgdir}/usr/bin/utau2rec"
+	install -D wavnorm     "${pkgdir}/usr/bin/wavnorm"
+	install -D genrudb.1   "${pkgdir}/usr/share/man/man1/genrudb.1"
+	install -D wavnorm.1   "${pkgdir}/usr/share/man/man1/wavnorm.1"
+}

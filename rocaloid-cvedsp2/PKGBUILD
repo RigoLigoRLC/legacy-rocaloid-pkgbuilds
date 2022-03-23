@@ -1,0 +1,46 @@
+
+pkgname=rocaloid-cvedsp2
+pkgver=0.0.ce35aba
+pkgrel=1
+epoch=
+pkgdesc="Cyber Voice Enging Digital Signal Processor part of Rocaloid Project"
+arch=('x86_64')
+url="https://github.com/Rocaloid/CVEDSP2"
+license=('LGPL3')
+groups=()
+depends=()
+makedepends=('cmake' 'rocaloid-rutil2' 'rocaloid-rfnl')
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("git+${url}.git")
+md5sums=('SKIP')
+validpgpkeys=()
+
+pkgver() {
+  cd "${srcdir}/CVEDSP2"
+  echo "0.0."`git describe --always`
+}
+
+build() {
+    cd "$srcdir/CVEDSP2"
+    sed -i 's/add_subdirectory(external\/RUtil2)//g' CMakeLists.txt
+    sed -i 's/add_subdirectory(external\/RFNL)//g' CMakeLists.txt
+    mkdir -p build
+    cd build
+    cmake ../ -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=/usr
+    make -j6
+}
+
+package() {
+	cd "$srcdir/CVEDSP2/build"
+	install -D libCVEDSP2.a "${pkgdir}/usr/lib/libCVEDSP2.a"
+	# Dirty hack, I don't wanna do this but EHH
+	cp -R include "${pkgdir}/usr/"
+}

@@ -1,0 +1,44 @@
+
+pkgname=rocaloid-rutil2
+pkgver=0.0.7cc89c0
+pkgrel=1
+epoch=
+pkgdesc="Various coding utilities part of Rocaloid Project"
+arch=('x86_64')
+url="https://github.com/Rocaloid/RUtil2"
+license=('MIT')
+groups=()
+depends=()
+makedepends=('cmake')
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("git+https://github.com/Rocaloid/RUtil2.git")
+md5sums=('SKIP')
+validpgpkeys=()
+
+pkgver() {
+  cd "${srcdir}/RUtil2"
+  echo "0.0."`git describe --always`
+}
+
+build() {
+    cd "$srcdir/RUtil2"
+    mkdir -p build
+    cd build
+    cmake ../ -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=/usr
+    make -j6
+}
+
+package() {
+	cd "$srcdir/RUtil2/build"
+	install -D libRUtil2.a "${pkgdir}/usr/lib/libRUtil2.a"
+	# Dirty hack, I don't wanna do this but EHH
+	cp -R include "${pkgdir}/usr/"
+}

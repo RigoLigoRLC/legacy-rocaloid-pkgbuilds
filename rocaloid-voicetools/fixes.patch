@@ -1,0 +1,143 @@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index e2078ab..a224f4b 100755
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -16,6 +16,7 @@ target_link_libraries(rsegment RUCE)
+ target_link_libraries(rsegment CVESVP)
+ target_link_libraries(rsegment CVEDSP2)
+ target_link_libraries(rsegment RFNL)
++target_link_libraries(rsegment RUtil2)
+ target_link_libraries(rsegment m)
+ 
+ aux_source_directory(./GenRUDB GRUDB_SRC_LIST)
+@@ -58,12 +59,14 @@ aux_source_directory(./Utau2Rec U2REC_SRC_LIST)
+ aux_source_directory(. U2REC_SRC_LIST)
+ add_executable(utau2rec ${U2REC_SRC_LIST})
+ target_link_libraries(utau2rec RFNL)
++target_link_libraries(utau2rec RUtil2)
+ 
+ aux_source_directory(./PrecompDiff PCDIFF_SRC_LIST)
+ aux_source_directory(. PCDIFF_SRC_LIST)
+ add_executable(pcompdiff ${PCDIFF_SRC_LIST})
+ target_link_libraries(pcompdiff CVEDSP2)
+ target_link_libraries(pcompdiff RFNL)
++target_link_libraries(pcompdiff RUtil2)
+ target_link_libraries(pcompdiff m)
+ 
+ aux_source_directory(./RUDB2Oct R2OCT_SRC_LIST)
+diff --git a/src/Commons.h b/src/Commons.h
+index 835dcac..8386e71 100644
+--- a/src/Commons.h
++++ b/src/Commons.h
+@@ -14,7 +14,7 @@
+ #define NormIterfector CDSP2_NormIterfector_Float
+ #define Real Float
+ 
+-Array_Define(String, RecList);
++Array_Extern(String, RecList);
+ 
+ static void ParseRecFile(File* Sorc)
+ {
+diff --git a/src/GenRUDB/Common.h b/src/GenRUDB/Common.h
+index 2ddd383..591156d 100644
+--- a/src/GenRUDB/Common.h
++++ b/src/GenRUDB/Common.h
+@@ -3,33 +3,33 @@
+ 
+ #define Version "1.3.1.1"
+ 
+-char* CWavFile;
+-int   QuitFlag;
+-float UFundFreq;
+-float LFundFreq;
+-char* CFundMethod;
+-int   Stochastic;
+-float USinuFreq;
+-float HCorrThreshold;
+-int   HopSize;
+-int   WinSize;
+-char* CWindow;
+-float VOT;
+-int   VOTFlag;
+-float Alpha;
+-float InvarThreshold;
+-int   VerboseFlag;
++extern char* CWavFile;
++extern int   QuitFlag;
++extern float UFundFreq;
++extern float LFundFreq;
++extern char* CFundMethod;
++extern int   Stochastic;
++extern float USinuFreq;
++extern float HCorrThreshold;
++extern int   HopSize;
++extern int   WinSize;
++extern char* CWindow;
++extern float VOT;
++extern int   VOTFlag;
++extern float Alpha;
++extern float InvarThreshold;
++extern int   VerboseFlag;
+ 
+-String FundMethod, UnitName, WavName, WindowName;
++extern String FundMethod, UnitName, WavName, WindowName;
+ 
+-enum
++extern enum _EWindowT
+ {
+     Hanning = 0,
+     Hamming,
+     Blackman
+ } EWindow;
+ 
+-int EF0;
++extern int EF0;
+ 
+ #endif
+ 
+diff --git a/src/GenRUDB/main.c b/src/GenRUDB/main.c
+index f230cb1..94860c3 100644
+--- a/src/GenRUDB/main.c
++++ b/src/GenRUDB/main.c
+@@ -10,6 +10,29 @@
+ #include "Common.h"
+ #include "../Commons.h"
+ 
++char* CWavFile;
++int   QuitFlag;
++float UFundFreq;
++float LFundFreq;
++char* CFundMethod;
++int   Stochastic;
++float USinuFreq;
++float HCorrThreshold;
++int   HopSize;
++int   WinSize;
++char* CWindow;
++float VOT;
++int   VOTFlag;
++float Alpha;
++float InvarThreshold;
++int   VerboseFlag;
++
++String FundMethod, UnitName, WavName, WindowName;
++
++enum _EWindowT EWindow;
++
++int EF0;
++
+ static void PrintUsage()
+ {
+     fprintf(stderr, "Usage: genrudb [-u freq] [-l freq] [-m method] [-S]\n"
+diff --git a/src/RSegment/main.c b/src/RSegment/main.c
+index 618a74e..1db05fb 100644
+--- a/src/RSegment/main.c
++++ b/src/RSegment/main.c
+@@ -20,6 +20,7 @@ OPTIONS
+ */
+ 
+ Array_Define(int, SegList);
++Array_Define(String, RecList);
+ 
+ #include "../Commons.h"
+ 

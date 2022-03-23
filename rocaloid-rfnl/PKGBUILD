@@ -1,0 +1,46 @@
+
+pkgname=rocaloid-rfnl
+pkgver=0.0.7cc89c0
+pkgrel=1
+epoch=
+pkgdesc="Fast numerical library part of Rocaloid Project"
+arch=('x86_64')
+url="https://github.com/Rocaloid/RFNL"
+license=('LGPL3')
+groups=()
+depends=()
+makedepends=('cmake', 'rocaloid-rutil2')
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("git+${url}.git")
+md5sums=('SKIP')
+validpgpkeys=()
+
+pkgver() {
+  cd "${srcdir}/RFNL"
+  echo "0.0."`git describe --always`
+}
+
+build() {
+    cd "$srcdir/RFNL"
+    # No need to build RUtil2 again here
+    sed -i 's/add_subdirectory(external\/RUtil2)//g' CMakeLists.txt
+    mkdir -p build
+    cd build
+    cmake ../ -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=/usr
+    make -j6
+}
+
+package() {
+	cd "$srcdir/RFNL/build"
+	install -D libRFNL.a "${pkgdir}/usr/lib/libRFNL.a"
+	# Dirty hack, I don't wanna do this but EHH
+	cp -R include "${pkgdir}/usr/"
+}

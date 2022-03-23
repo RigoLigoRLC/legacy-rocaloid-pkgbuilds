@@ -1,0 +1,50 @@
+
+pkgname=rocaloid-ruce
+pkgver=0.0.9bdca14
+pkgrel=1
+epoch=
+pkgdesc="Rocaloid UTAU Compatible Engine synthesis engine"
+arch=('x86_64')
+url="https://github.com/Rocaloid/RUCE"
+license=('GPL3')
+groups=()
+depends=()
+makedepends=('cmake' 'rocaloid-rutil2' 'rocaloid-cvesvp' 'rocaloid-cvedsp2' 'rocaloid-rfnl')
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("git+${url}.git")
+md5sums=('SKIP')
+validpgpkeys=()
+
+pkgver() {
+  cd "${srcdir}/RUCE"
+  echo "0.0."`git describe --always`
+}
+
+build() {
+    cd "$srcdir/RUCE"
+    sed -i 's/add_subdirectory(external\/RUtil2)//g' CMakeLists.txt
+    sed -i 's/add_subdirectory(external\/CVESVP)//g' CMakeLists.txt
+    # Make RUCE link against CVEDSP, RFNL & RUtil2 to match our packaging scheme
+    sed -i -E 's/(target_link_libraries\(.+)CVESVP(.+\))/\1 CVESVP CVEDSP2 RFNL RUtil2 \2/g' CMakeLists.txt
+    mkdir -p build
+    cd build
+    cmake ../ -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=/usr
+    make -j6
+}
+
+package() {
+	cd "$srcdir/RUCE/build"
+	install -D RUCE_CLI "${pkgdir}/usr/bin/RUCE_CLI"
+	install -D libRUCE_s.a "${pkgdir}/usr/lib/libRUCE_s.a"
+	install -D libRUCE.so "${pkgdir}/usr/lib/libRUCE.so"
+	# Dirty hack, I don't wanna do this but EHH
+	cp -R include "${pkgdir}/usr/"
+}
